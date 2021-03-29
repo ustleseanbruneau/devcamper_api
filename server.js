@@ -4,6 +4,7 @@ const logger = require('./middleware/logger')
 const morgan = require('morgan')
 const colors = require('colors')
 const connectDB = require('./config/db')
+const errorHandler = require('./middleware/error')
 
 // Load env vars
 dotenv.config({ path: './config/config.env' })
@@ -28,6 +29,8 @@ app.use(logger)
 
 // Mount routers
 app.use('/api/v1/bootcamps', bootcamps)
+
+app.use(errorHandler)
 
 /*
 app.get('/', (req, res) => {
