@@ -6,13 +6,8 @@ const Bootcamp = require('../models/Bootcamp')
 // @route   GET /api/v1/bootcamps
 // @access  PUBLIC
 //exports.getBootcamps = async (req, res, next) => {
-exports.getBootcamps = asyncHandler(async (req, res, next) => {
   //res.status(200).json({ success: true, msg: 'Show all bootcamps', hello: req.hello })
   //res.status(200).json({ success: true, msg: 'Show all bootcamps' })
-
-  const bootcamps = await Bootcamp.find()
-
-  res.status(200).json({ success: true, count: bootcamps.length, data: bootcamps })
 
   /*
   try {
@@ -24,13 +19,19 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
     next(err)
   }
   */
+//} 
+exports.getBootcamps = asyncHandler(async (req, res, next) => {
+
+  const bootcamps = await Bootcamp.find()
+
+  res.status(200).json({ success: true, count: bootcamps.length, data: bootcamps })
 
 })
-//} 
 
 // @desc    GET single bootcamps
 // @route   GET /api/v1/bootcamps/:id
 // @access  PUBLIC
+
 exports.getBootcamp = asyncHandler(async (req, res, next) => {
   //res.status(200).json({ success: true, msg: `Get bootcamp ${req.params.id}` })
 
