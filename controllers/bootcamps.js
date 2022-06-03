@@ -21,9 +21,24 @@ const Bootcamp = require('../models/Bootcamp')
   }
   */
 //} 
-exports.getBootcamps = asyncHandler(async (req, res, next) => {
 
-  const bootcamps = await Bootcamp.find()
+// {{URL}}/api/v1/bootcamps?averageCost[gte]=10000&location.city=Boston
+// {{URL}}/api/v1/bootcamps?careers[in]=Business
+exports.getBootcamps = asyncHandler(async (req, res, next) => {
+  //const bootcamps = await Bootcamp.find()
+  //const bootcamps = await Bootcamp.find(req.query)
+
+  //console.log(req.query)
+
+  let query
+
+  let queryStr = JSON.stringify(req.query)
+
+  queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`)
+
+  query = Bootcamp.find(JSON.parse(queryStr))
+
+  const bootcamps = await query
 
   res.status(200).json({ success: true, count: bootcamps.length, data: bootcamps })
 
