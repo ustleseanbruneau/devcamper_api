@@ -24,6 +24,23 @@ const Bootcamp = require('../models/Bootcamp')
 
 // {{URL}}/api/v1/bootcamps?averageCost[gte]=10000&location.city=Boston
 // {{URL}}/api/v1/bootcamps?careers[in]=Business
+
+// Select only name,description,housing fields
+//  {{URL}}/api/v1/bootcamps?select=name,description,housing
+
+// Select only name,description,housing fields with filter housing=true
+//  {{URL}}/api/v1/bootcamps?select=name,description,housing&housing=true
+
+// Sort
+// Ascending name
+// {{URL}}/api/v1/bootcamps?select=name,description,housing&sort=name
+
+// Decending name
+// {{URL}}/api/v1/bootcamps?select=name,description,housing&sort=-name
+
+// @desc    GET all bootcamps
+// @route   GET /api/v1/bootcamps
+// @access  PUBLIC
 exports.getBootcamps = asyncHandler(async (req, res, next) => {
   //const bootcamps = await Bootcamp.find()
   //const bootcamps = await Bootcamp.find(req.query)
@@ -31,13 +48,42 @@ exports.getBootcamps = asyncHandler(async (req, res, next) => {
   //console.log(req.query)
 
   let query
+  // Copy req.query
+  const reqQuery = { ...req.query }
 
-  let queryStr = JSON.stringify(req.query)
+  // Fields to exclude
+  const removeFields = ['select', 'sort']
 
+  // Loop over removeFields and delete them from reqQuery
+  removeFields.forEach(param => delete reqQuery[param])
+
+  console.log(reqQuery)
+
+  //let queryStr = JSON.stringify(req.query)
+  // Create query string
+  let queryStr = JSON.stringify(reqQuery)
+
+  // Create operators ($gt, $gte, etc)
   queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`)
 
+  // Finding resource
   query = Bootcamp.find(JSON.parse(queryStr))
 
+  // Select Fields
+  if(req.query.select) {
+    const fields = req.query.select.split(',').join(' ')
+    query = query.select(fields)
+  }
+
+  // Sort Fields
+  if(req.query.sort) {
+    const sortBy = req.query.sort.split(',').join(' ')
+    query = query.sort(sortBy)
+  } else {
+    query = query.sort('-createdAt')
+  }
+
+  // Executing query
   const bootcamps = await query
 
   res.status(200).json({ success: true, count: bootcamps.length, data: bootcamps })
